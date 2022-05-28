@@ -1,20 +1,17 @@
 const WORD_LENGTH = 5
-const FLIP_ANIMATION_DURATION = 500
-const DANCE_ANIMATION_DURATION = 500
+const FLIP_ANIMATION_DURATION = 100
+const DANCE_ANIMATION_DURATION = 100
 const keyboard = document.querySelector("[data-keyboard]")
 const alertContainer = document.querySelector("[data-alert-container]")
 const guessGrid = document.querySelector("[data-guess-grid]")
-
 const targetWord = allWords[Date.now() % allWords.length];
 
-startInteraction()
-
-function startInteraction() {
+function addListeners() {
   document.addEventListener("click", handleMouseClick)
   document.addEventListener("keydown", handleKeyPress)
 }
 
-function stopInteraction() {
+function stop() {
   document.removeEventListener("click", handleMouseClick)
   document.removeEventListener("keydown", handleKeyPress)
 }
@@ -89,7 +86,7 @@ function submitGuess() {
     return
   }
 
-  stopInteraction()
+  stop()
   activeTiles.forEach((...params) => flipTile(...params, guess))
 }
 
@@ -119,7 +116,7 @@ function flipTile(tile, index, array, guess) {
         tile.addEventListener(
           "transitionend",
           () => {
-            startInteraction()
+            addListeners()
             checkWinLose(guess, array)
           },
           { once: true }
@@ -166,14 +163,10 @@ function checkWinLose(guess, tiles) {
   if (guess === targetWord) {
     showAlert("You Win", 5000)
     danceTiles(tiles)
-    stopInteraction()
-    return
-  }
-
-  const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])")
-  if (remainingTiles.length === 0) {
-    showAlert(targetWord.toUpperCase(), null)
-    stopInteraction()
+    stop()
+  } else if (guessGrid.querySelectorAll(":not([data-letter])").length === 0) {
+    showAlert("YOU LOST The word is " + targetWord.toUpperCase(), null)
+    stop()
   }
 }
 
